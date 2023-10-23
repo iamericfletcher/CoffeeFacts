@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= title %></title>
-  <link rel='stylesheet' href='/stylesheets/style.css' />
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
 </head>
 <body>
 <nav id="nav-container">
-    <button id="login-button">
-        <a href="/login">Login</a>
-    </button>
+    <ul id="nav-list">
+        <% if (!isAuthenticated) { %>
+            <li>
+                <a href="/login" id="login-btn">Login</a>
+            </li>
+        <% } else { %>
+            <li>
+                <a href="/logout" id="logout-btn">Logout</a>
+            </li>
+        <% } %>
+    </ul>
 </nav>
 <h1><%= title %> API</h1>
 <h2>Enjoy a freshly brewed coffee fact:</h2>
 <ul>
-  <% facts.forEach(function(fact) { %>
-    <li><%= fact.fact %></li>
-  <% }); %>
+    <% facts.forEach(function(fact) { %>
+        <li><%= fact.fact %></li>
+    <% }); %>
 </ul>
 <a href="https://github.com/iamericfletcher/CoffeeFacts" target="_blank">API Information</a>
 </body>

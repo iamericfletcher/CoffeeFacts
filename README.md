@@ -43,3 +43,7 @@ authenticate via Gmail.
 
 - Feel free to open issues or PRs!
 
+## References
+- [Auth0](https://auth0.com)
+- [Add Authentication to Existing Node.js/Express Apps with Auth0 | Express and Auth Series Part 2](https://youtu.be/HTjfDUm1RsU?si=yv2VWos_LvcFiM9A)
+
