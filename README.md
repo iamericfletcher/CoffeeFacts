@@ -32,7 +32,14 @@ the site, you're in the right place!
 | `fact`         | TEXT      | The coffee fact text         |
 | `source`       | TEXT      | Source of the fact           |
 | `submitted_on` | DATETIME  | Timestamp of the submission  |
-| `user_id`      | TEXT      | Auth0 user sub identifier    |
+| `user_id`      | TEXT      | Auth0 user sub identifier*   |
+
+#### *Auth0 User Sub Identifier
+
+- Subject Identifier. A locally unique and never reassigned identifier within the Issuer for the End-User, which is
+  intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
+    - https://auth0.com/docs/secure/tokens
+    - https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
 
 ## API
 
@@ -50,7 +57,7 @@ checks on all routes except `/public`.
 
 #### `GET /private`
 
-- Fetches all facts, including private ones.
+- Fetches all facts, including Auth0 `user_id`.
 - 🛡️ JWT Check
 
 #### Other CRUD Endpoints
@@ -95,3 +102,4 @@ Built with Axios to communicate with the backend where the database interactions
 
 - [Auth0](https://auth0.com)
 - [OAuth2 JWT Bearer GitHub](https://github.com/auth0/express-oauth2-jwt-bearer)
+- [Express and Authentication Series using Auth0](https://www.youtube.com/playlist?list=PLshTZo9V1-aGzE7xMaQrCUOQ-R-8A7Jzq)
