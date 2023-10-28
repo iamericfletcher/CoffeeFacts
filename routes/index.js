@@ -1,6 +1,17 @@
+const rateLimit = require('express-rate-limit');
 let express = require('express');
 let axios = require('axios');
 let router = express.Router();
+
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5 // limit each IP to 100 requests per windowMs
+});
+
+// Apply to all requests
+router.use(limiter);
+
 
 router.get('/', async function (req, res) {
     try {
