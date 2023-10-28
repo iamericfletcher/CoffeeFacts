@@ -8,10 +8,12 @@ the site, you're in the right place!
 
 ## Tech Stack
 
-- **Frontend**: HTML, CSS, JS, Axios
+- **Authentication**: OAuth 2.0, express-oauth2-jwt-bearer
 - **Backend**: Node.js with Express
 - **Database**: SQLite3 - currently hosted on DigitalOcean Droplet
-- **Authentication**: OAuth 2.0, express-oauth2-jwt-bearer
+- **Deployment**: GitHub and DigitalOcean App Platform
+- **Frontend**: Express with EJS templates, Axios to communicate with the backend
+- **Process Management**: PM2
 
 ## Database Schema
 
