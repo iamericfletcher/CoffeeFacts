@@ -6,6 +6,9 @@ Nature Documentary personality](https://youtu.be/djzOBZUFzTw?si=7GcjxQoGOI_IjBnP
 want to help the project grow by contributing to the codebase or high-quality facts and their sources by logging into
 the site, you're in the right place!
 
+This is the frontend repository. The backend repository is located
+at [Coffee Facts API Backend](https://github.com/iamericfletcher/CoffeeFactsDBAPI).
+
 ## Tech Stack
 
 - **Authentication**: OAuth 2.0, express-oauth2-jwt-bearer
