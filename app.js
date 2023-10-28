@@ -12,13 +12,19 @@ const config = {
   secret: process.env.SECRET,
   baseURL: process.env.BASEURL,
   clientID: process.env.CLIENTID,
-  issuerBaseURL: process.env.ISSUERBASEURL
+  issuerBaseURL: process.env.ISSUERBASEURL,
+  clientSecret: process.env.CLIENTSECRET,
+  authorizationParams: {
+    response_type: "code",
+    audience: "http://localhost:3002",
+    scope: "openid profile email",
+  }
 };
 
 let indexRouter = require('./routes/index');
 // let usersRouter = require('./routes/users');
 // let loginRouter = require('./routes/login');
-let userProfileRouter = require('./routes/userProfile');
+// let userProfileRouter = require('./routes/userProfile');
 
 let app = express();
 
@@ -37,7 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 // app.use('/login', loginRouter);
-app.use('/userProfile', userProfileRouter);
+// app.use('/userProfile', userProfileRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -45,7 +51,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

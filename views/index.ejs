@@ -1,30 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css'/>
 </head>
 <body>
-<nav id="nav-container">
-    <ul id="nav-list">
-        <% if (!isAuthenticated) { %>
-            <li>
-                <a href="/login" id="login-btn">Login</a>
-            </li>
-        <% } else { %>
-            <li>
-                <a href="/logout" id="logout-btn">Logout</a>
-            </li>
-        <% } %>
-    </ul>
-</nav>
+<%- include('partials/nav') %>
+
 <h1><%= title %> API</h1>
+<h3>API for coffee facts</h3>
+
+<!-- Intro about the API and the project's educational goals -->
+<p>This API serves coffee facts in JSON format and is geared towards those wanting to learn how to interact with APIs.
+    There are many APIs to learn from, but coffee is amazing, so why not use this one?!</p>
+
+<!-- Details about user login and contribution -->
+<p>We encourage users to <strong>log in</strong> and help this project grow. Once logged in, you can submit
+    high quality coffee facts along with their sources to be included in the database. You also have the option to view,
+    edit, or delete facts you've previously submitted as well!</p>
+
+<p>The API is available at <a href="http://localhost:3002/public" target="_blank">http://localhost:3002/public</a></p>
+<p>To use the API, simply make a GET request to the URL above. The API will return a JSON object with coffee facts.</p>
+
+<p>Example:</p>
+<pre>
+    <code>
+        {
+            "id": 1,
+            "fact": "Coffee is a complex mixture of more than a thousand chemicals.",
+            "source": "https://onlinelibrary.wiley.com/doi/full/10.1002/ijc.24124",
+            "submitted_on": "2023-10-27 16:10:42"
+        }
+    </code>
+</pre>
+
 <h2>Enjoy a freshly brewed coffee fact:</h2>
+<!-- Display one random fact from the database -->
 <ul>
-    <% facts.forEach(function(fact) { %>
-        <li><%= fact.fact %></li>
-    <% }); %>
+    <li>
+        <u><b class="fact-label">Fact:</b></u> <span class="fact-content"><%= facts.fact %></span>
+    </li>
+    <li>
+        <u><b class="source-label">Fact Source:</b></u> <span class="source-content"><%= facts.source %></span>
+    </li>
+    <li>
+        <u><b class="source-label">Fact Submit Date:</b></u> <span
+                class="source-content"><%= facts.submitted_on %></span>
+    </li>
 </ul>
-<a href="https://github.com/iamericfletcher/CoffeeFacts" target="_blank">API Information</a>
+<a href="https://github.com/iamericfletcher/CoffeeFacts" target="_blank">Additional API Information + Source Code</a>
 </body>
 </html>
