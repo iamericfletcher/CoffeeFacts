@@ -14,6 +14,7 @@ the site, you're in the right place!
 - **Deployment**: GitHub and DigitalOcean App Platform
 - **Frontend**: Express with EJS templates, Axios to communicate with the backend
 - **Process Management**: PM2
+- **Rate Limiting**: Express Rate Limit
 
 ## Database Schema
 
