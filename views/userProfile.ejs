@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+<%- include('partials/nav') %>
+<h1>
+    Profile Page
+</h1>
+<h2>Coffee Fact Submission Form</h2>
+<form action="/submit" method="post">
+    <label for="fact">Fact:</label>
+    <input type="text" id="fact" name="fact" required>
+    <br>
+    <label for="source">Source:</label>
+    <input type="text" id="source" name="source" required>
+    <br>
+    <input type="submit" value="Submit">
+</form>
+<h2>Your Coffee Facts</h2>
+<ul class="fact-list">
+    <% for (let i = 0; i < data.length; i++) { %>
+        <li class="fact-item">
+            <u><b class="fact-label">Fact:</b></u> <span class="fact-content"><%= data[i].fact %></span>
+            <br>
+            <u><b class="source-label">Source:</b></u> <span class="source-content"><%= data[i].source %></span>
+            <br>
+            <u><b class="source-label">Fact Submit Date:</b></u> <span
+                    class="source-content"><%= data[i].submitted_on %></span>
+            <div class="button-container">
+                <a class="edit-button" href="/editFact/<%= data[i].id %>">Edit</a>
+                <form action="/deleteFact/<%= data[i].id %>" method="post" class="inline-form">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </div>
+        </li>
+    <% } %>
+</ul>
+</body>
+</html>

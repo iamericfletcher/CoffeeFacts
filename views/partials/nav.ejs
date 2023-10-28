@@ -1,0 +1,17 @@
+<nav id="nav-container">
+    <ul id="nav-list">
+        <% if (!isAuthenticated) { %>
+            <li>
+                <a href="/login" class="btn" id="login-btn">Login</a>
+            </li>
+        <% } else { %>
+                <li><a href="/" class="btn">Home</a></li>
+            <li>
+                <a href="/userProfile" class="btn">Profile</a>
+            </li>
+            <li>
+                <a href="/logout" class="btn" id="logout-btn">Logout</a>
+            </li>
+        <% } %>
+    </ul>
+</nav>
