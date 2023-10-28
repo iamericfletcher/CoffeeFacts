@@ -4,7 +4,8 @@ let router = express.Router();
 
 router.get('/', async function (req, res) {
     try {
-        const response = await axios.get('http://localhost:3002/public');
+        const response = await axios.get('http://64.227.28.79:3002/public');
+        // const response = await axios.get('http://localhost:3002/public');
         if (response.data.length === 0) {
             res.render('index', {
                 title: 'CoffeeFacts',
@@ -40,7 +41,7 @@ router.get('/userProfile', async function (req, res) {
         const {token_type, access_token} = req.oidc.accessToken;
 
         try {
-            const response = await axios.get('http://localhost:3002/private', {
+            const response = await axios.get('http://64.227.28.79:3002/private', {
                 headers: {
                     authorization: `${token_type} ${access_token}`
                 }
@@ -72,7 +73,7 @@ router.get('/editFact/:id', async (req, res) => {
         const user_id = req.oidc.user.sub;
 
         try {
-            const response = await axios.get(`http://localhost:3002/editFact/${id}`, {
+            const response = await axios.get(`http://64.227.28.79:3002/editFact/${id}`, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -103,7 +104,7 @@ router.post('/editFact/:id', (req, res) => {
         const {fact, source} = req.body;
 
         // Update the fact using axios
-        axios.put(`http://localhost:3002/editFact/${id}`, {
+        axios.put(`http://64.227.28.79:3002/editFact/${id}`, {
             fact,
             source
         }, {
@@ -132,7 +133,7 @@ router.post('/submit', async (req, res) => {
         const user_id = req.oidc.user.sub;
 
         try {
-            await axios.post('http://localhost:3002/addFact', {fact, source, user_id}, {
+            await axios.post('http://64.227.28.79:3002/addFact', {fact, source, user_id}, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -148,7 +149,7 @@ router.post('/deleteFact/:id', (req, res) => {
         return res.status(403).send('You are not authorized to delete this fact.');
     } else {
         const id = req.params.id;
-        axios.delete(`http://localhost:3002/deleteFact/${id}`, {
+        axios.delete(`http://64.227.28.79:3002/deleteFact/${id}`, {
             headers: {
                 authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
             }
