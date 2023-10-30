@@ -2,7 +2,7 @@ const rateLimit = require('express-rate-limit');
 let express = require('express');
 let axios = require('axios');
 let router = express.Router();
-
+require('dotenv').config();
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -12,30 +12,60 @@ const limiter = rateLimit({
 // Apply to all requests
 router.use(limiter);
 
+// Middleware to check if user is an admin
+async function isAdmin(req, res, next) {
+    if (!req.oidc.isAuthenticated()) {
+        return false;
+    } else {
+        const id = req.oidc.user.sub;
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://dev-zrsam7livd1kfvrr.us.auth0.com/api/v2/roles/rol_gezouxKZTeZ4o2q5/users',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + process.env.MANAGEMENTAPITOKEN
+            }
+        };
+        try {
+            const response = await axios(config);
+            const admins = response.data.map(item => item.user_id);
+            return admins.includes(id);
+        } catch (error) {
+            console.log('Error fetching data:', error);
+            res.status(500).send('Error fetching data.');
+        }
+    }
+}
+
+
 
 router.get('/', async function (req, res) {
     try {
-        const response = await axios.get('http://64.227.28.79:3002/public');
-        // const response = await axios.get('http://localhost:3002/public');
+        // const response = await axios.get('http://64.227.28.79:3002/public');
+        const response = await axios.get(process.env.DEVSERVER + '/public');
         if (response.data.length === 0) {
             res.render('index', {
                 title: 'CoffeeFacts',
                 facts: [{"fact": "No facts in database"}],
-                isAuthenticated: req.oidc.isAuthenticated()
+                isAuthenticated: req.oidc.isAuthenticated(),
+                isAdmin: await isAdmin(req, res)
             });
         } else {
             let randomFact = Math.floor(Math.random() * response.data.length);
             res.render('index', {
                 title: 'CoffeeFacts',
                 facts: response.data[randomFact],
-                isAuthenticated: req.oidc.isAuthenticated()
+                isAuthenticated: req.oidc.isAuthenticated(),
+                isAdmin: await isAdmin(req, res)
             });
         }
     } catch (error) {
         res.render('index', {
             title: 'CoffeeFacts',
             facts: [{"fact": "Error fetching data from database"}],
-            isAuthenticated: req.oidc.isAuthenticated()
+            isAuthenticated: req.oidc.isAuthenticated(),
+            isAdmin: await isAdmin(req, res)
         });
     }
 });
@@ -48,19 +78,25 @@ router.get('/userProfile', async function (req, res) {
     } else {
         // Fetch facts specific to the authenticated user
         let data;
+        let data_pending;
         const userId = req.oidc.user.sub;
         const {token_type, access_token} = req.oidc.accessToken;
 
         try {
-            const response = await axios.get('http://64.227.28.79:3002/private', {
+            // const response = await axios.get('http://64.227.28.79:3002/private', {
+            const response = await axios.get(process.env.DEVSERVER + '/private', {
                 headers: {
                     authorization: `${token_type} ${access_token}`
                 }
             });
-            data = response.data.filter(item => item.user_id === userId);
+            // Filter the response data to only include facts submitted by the authenticated user and approved by an admin
+            data = response.data.filter(item => item.user_id === userId && item.is_approved === 1);
+            // Filter the response data to only include facts submitted by the authenticated user and are pending approval
+            data_pending = response.data.filter(item => item.user_id === userId && item.is_approved === 0);
         } catch (error) {
             console.log('Error fetching data:', error);
             data = [{"fact": "Error fetching data from database"}];
+            data_pending = [{"fact": "Error fetching data from database"}];
         }
 
         // Render the user profile page
@@ -69,7 +105,9 @@ router.get('/userProfile', async function (req, res) {
             isAuthenticated: req.oidc.isAuthenticated(),
             user: req.oidc.user,
             user_id: userId,
-            data: data
+            data: data,
+            data_pending: data_pending,
+            isAdmin: await isAdmin(req, res)
         });
     }
 });
@@ -84,7 +122,8 @@ router.get('/editFact/:id', async (req, res) => {
         const user_id = req.oidc.user.sub;
 
         try {
-            const response = await axios.get(`http://64.227.28.79:3002/editFact/${id}`, {
+            // const response = await axios.get(`http://64.227.28.79:3002/editFact/${id}`, {
+            const response = await axios.get(process.env.DEVSERVER + `/editFact/${id}`, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -115,7 +154,8 @@ router.post('/editFact/:id', (req, res) => {
         const {fact, source} = req.body;
 
         // Update the fact using axios
-        axios.put(`http://64.227.28.79:3002/editFact/${id}`, {
+        // axios.put(`http://64.227.28.79:3002/editFact/${id}`, {
+        axios.put(process.env.DEVSERVER + `/editFact/${id}`, {
             fact,
             source
         }, {
@@ -144,7 +184,8 @@ router.post('/submit', async (req, res) => {
         const user_id = req.oidc.user.sub;
 
         try {
-            await axios.post('http://64.227.28.79:3002/addFact', {fact, source, user_id}, {
+            // await axios.post('http://64.227.28.79:3002/addFact', {fact, source, user_id}, {
+            await axios.post(process.env.DEVSERVER + '/addFact', {fact, source, user_id}, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -160,7 +201,8 @@ router.post('/deleteFact/:id', (req, res) => {
         return res.status(403).send('You are not authorized to delete this fact.');
     } else {
         const id = req.params.id;
-        axios.delete(`http://64.227.28.79:3002/deleteFact/${id}`, {
+        // axios.delete(`http://64.227.28.79:3002/deleteFact/${id}`, {
+        axios.delete(process.env.DEVSERVER + `/deleteFact/${id}`, {
             headers: {
                 authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
             }
@@ -173,7 +215,84 @@ router.post('/deleteFact/:id', (req, res) => {
     }
 });
 
+// Admin route to request all unapproved facts from the database
+router.get('/adminPanel', async (req, res) => {
 
+    // Check if user is an admin
+    if (!req.oidc.isAuthenticated()) {
+        return res.status(403).send('You are not authorized to view this page.');
+    } else {
+        try {
+            // const response = await axios.get('http://64.227.28.79:3002/unapprovedFacts', {
+            const response = await axios.get(process.env.DEVSERVER + '/unapprovedFacts', {
+                headers: {
+                    authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
+                }
+            });
+            res.render('adminPanel', {
+                title: 'Admin',
+                isAuthenticated: req.oidc.isAuthenticated(),
+                user: req.oidc.user,
+                facts: response.data,
+                isAdmin: await isAdmin(req, res)
+            });
+        } catch (error) {
+            console.log('Error fetching data:', error);
+            return res.status(500).send('Error fetching data.');
+        }
+    }
+});
+
+// Admin route to approve a fact
+router.post('/adminApproveFact/:id', (req, res) => {
+    // Check if user is an admin
+    if (!req.oidc.isAuthenticated()) {
+        return res.status(403).send('You are not authorized to approve this fact.');
+    } else {
+        const id = req.params.id;
+        axios.put(process.env.DEVSERVER + `/adminApproveFact/${id}`, {}, {
+            headers: {
+                authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
+            }
+        }).then(response => {
+            if (response.data.success) {
+                res.redirect('/adminPanel');
+            } else {
+                res.status(500).send('Error updating data.');
+            }
+        }).catch(error => {
+            console.log('Error updating data:', error);
+            res.status(500).send('Error updating data.');
+        });
+    }
+}
+);
+
+// Admin route to reject a fact
+router.post('/adminRejectFact/:id', (req, res) => {
+
+    // Check if user is an admin
+    if (!req.oidc.isAuthenticated()) {
+        return res.status(403).send('You are not authorized to reject this fact.');
+    } else {
+        const id = req.params.id;
+        axios.delete(process.env.DEVSERVER + `/adminRejectFact/${id}`, {
+            headers: {
+                authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
+            }
+        }).then(response => {
+            if (response.data.success) {
+                res.redirect('/adminPanel');
+            } else {
+                res.status(500).send('Error updating data.');
+            }
+        }).catch(error => {
+            console.log('Error updating data:', error);
+            res.status(500).send('Error updating data.');
+        });
+    }
+}
+);
 
 
 module.exports = router;

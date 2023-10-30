@@ -9,6 +9,12 @@
             <li>
                 <a href="/userProfile" class="btn">Profile</a>
             </li>
+                <!--if isAdmin show adminPanel a link-->
+            <% if (isAdmin) { %>
+                <li>
+                    <a href="/adminPanel" class="btn">Admin Panel</a>
+                </li>
+            <% } %>
             <li>
                 <a href="/logout" class="btn" id="logout-btn">Logout</a>
             </li>

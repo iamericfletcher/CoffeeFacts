@@ -120,17 +120,25 @@ input[type="submit"]:hover {
 
 .button-container {
     display: flex;
-    margin-top: 1rem ;
+    margin-top: 1rem;
+}
+
+.delete-button {
+    background-color: #ff0000;
+}
+
+.edit-button {
+    background-color: #45a049;
 }
 
 .edit-button, .delete-button {
     margin-right: 10px;
-    background-color: #45a049;
     color: white;
     border: none;
     padding: 1rem 1rem;
     cursor: pointer;
     border-radius: 4px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 .edit-button a, .delete-button a {
@@ -195,4 +203,26 @@ h1 {
     h1 {
         text-align: left;
     }
+}
+
+/* Start adminPanel styling */
+.approve-button {
+    background-color: #45a049;
+    color: white;
+    border: none;
+    padding: 1rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 10px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.reject-button {
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 1rem 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }

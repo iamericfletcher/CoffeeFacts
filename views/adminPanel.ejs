@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Admin Panel</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+<%- include('partials/nav') %>
+<h1>Admin Panel</h1>
+<ul class="fact-list">
+    <% for (let i = 0; i < facts.length; i++) { %>
+        <li class="fact-item">
+            <u><b class="fact-label">Fact:</b></u> <span class="fact-content"><%= facts[i].fact %></span>
+            <br>
+            <u><b class="source-label">Source:</b></u> <span class="source-content"><%= facts[i].source %></span>
+            <br>
+            <u><b class="source-label">Fact Submit Date:</b></u> <span
+                    class="source-content"><%= facts[i].submitted_on %></span>
+            <div class="button-container">
+                <form action="/adminApproveFact/<%= facts[i].id %>" method="post" class="inline-form">
+                    <button type="submit" class="approve-button" >Approve</button>
+                </form>
+                <form action="/adminRejectFact/<%= facts[i].id %>" method="post" class="inline-form">
+                    <button type="submit" class="reject-button">Reject</button>
+                </form>
+            </div>
+        </li>
+    <% } %>
+</ul>
+</body>
+</html>
