@@ -12,21 +12,47 @@ const limiter = rateLimit({
 // Apply to all requests
 router.use(limiter);
 
+async function getManagementApiToken() {
+    const options = {
+        method: 'POST',
+        url: `https://${process.env.DOMAIN}/oauth/token`,
+        headers: {'content-type': 'application/x-www-form-urlencoded'},
+        data: new URLSearchParams({
+            grant_type: 'client_credentials',
+            client_id: process.env.CLIENTID,
+            client_secret: process.env.CLIENTSECRET,
+            audience: `https://${process.env.DOMAIN}/api/v2/`
+        })
+    };
+
+    try {
+        const response = await axios.request(options);
+        return response.data.access_token;
+    } catch (error) {
+        console.error('Error fetching Management API token:', error);
+        throw new Error('Could not fetch Management API token');
+    }
+}
+
+
 // Middleware to check if user is an admin
 async function isAdmin(req, res, next) {
     if (!req.oidc.isAuthenticated()) {
         return false;
     } else {
         const id = req.oidc.user.sub;
+        const managementApiToken = await getManagementApiToken();
+
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://dev-zrsam7livd1kfvrr.us.auth0.com/api/v2/roles/rol_gezouxKZTeZ4o2q5/users',
+            url: `https://${process.env.DOMAIN}/api/v2/roles/${process.env.ADMINROLEID}/users`,
             headers: {
                 'Accept': 'application/json',
-                'Authorization': 'Bearer ' + process.env.MANAGEMENTAPITOKEN
+                'Authorization': `Bearer ${managementApiToken}`
             }
         };
+
         try {
             const response = await axios(config);
             const admins = response.data.map(item => item.user_id);
@@ -37,7 +63,6 @@ async function isAdmin(req, res, next) {
         }
     }
 }
-
 
 
 router.get('/', async function (req, res) {
@@ -217,9 +242,9 @@ router.post('/deleteFact/:id', (req, res) => {
 
 // Admin route to request all unapproved facts from the database
 router.get('/adminPanel', async (req, res) => {
-
+    const admin = await isAdmin(req, res);
     // Check if user is an admin
-    if (!req.oidc.isAuthenticated()) {
+    if (!req.oidc.isAuthenticated() || !admin) {
         return res.status(403).send('You are not authorized to view this page.');
     } else {
         try {
@@ -234,7 +259,7 @@ router.get('/adminPanel', async (req, res) => {
                 isAuthenticated: req.oidc.isAuthenticated(),
                 user: req.oidc.user,
                 facts: response.data,
-                isAdmin: await isAdmin(req, res)
+                isAdmin: admin
             });
         } catch (error) {
             console.log('Error fetching data:', error);
@@ -244,54 +269,56 @@ router.get('/adminPanel', async (req, res) => {
 });
 
 // Admin route to approve a fact
-router.post('/adminApproveFact/:id', (req, res) => {
-    // Check if user is an admin
-    if (!req.oidc.isAuthenticated()) {
-        return res.status(403).send('You are not authorized to approve this fact.');
-    } else {
-        const id = req.params.id;
-        axios.put(process.env.DEVSERVER + `/adminApproveFact/${id}`, {}, {
-            headers: {
-                authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
-            }
-        }).then(response => {
-            if (response.data.success) {
-                res.redirect('/adminPanel');
-            } else {
+router.post('/adminApproveFact/:id', async (req, res) => {
+        // Check if user is an admin
+        const admin = await isAdmin(req, res);
+        console.log('is admin:', admin);
+        if (!req.oidc.isAuthenticated() || !admin) {
+            return res.status(403).send('You are not authorized to approve this fact.');
+        } else {
+            const id = req.params.id;
+            axios.put(process.env.DEVSERVER + `/adminApproveFact/${id}`, {}, {
+                headers: {
+                    authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
+                }
+            }).then(response => {
+                if (response.data.success) {
+                    res.redirect('/adminPanel');
+                } else {
+                    res.status(500).send('Error updating data.');
+                }
+            }).catch(error => {
+                console.log('Error updating data:', error);
                 res.status(500).send('Error updating data.');
-            }
-        }).catch(error => {
-            console.log('Error updating data:', error);
-            res.status(500).send('Error updating data.');
-        });
+            });
+        }
     }
-}
 );
 
 // Admin route to reject a fact
-router.post('/adminRejectFact/:id', (req, res) => {
-
-    // Check if user is an admin
-    if (!req.oidc.isAuthenticated()) {
-        return res.status(403).send('You are not authorized to reject this fact.');
-    } else {
-        const id = req.params.id;
-        axios.delete(process.env.DEVSERVER + `/adminRejectFact/${id}`, {
-            headers: {
-                authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
-            }
-        }).then(response => {
-            if (response.data.success) {
-                res.redirect('/adminPanel');
-            } else {
+router.post('/adminRejectFact/:id', async (req, res) => {
+        // Check if user is an admin
+        const admin = await isAdmin(req, res);
+        if (!req.oidc.isAuthenticated() || !admin) {
+            return res.status(403).send('You are not authorized to reject this fact.');
+        } else {
+            const id = req.params.id;
+            axios.delete(process.env.DEVSERVER + `/adminRejectFact/${id}`, {
+                headers: {
+                    authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
+                }
+            }).then(response => {
+                if (response.data.success) {
+                    res.redirect('/adminPanel');
+                } else {
+                    res.status(500).send('Error updating data.');
+                }
+            }).catch(error => {
+                console.log('Error updating data:', error);
                 res.status(500).send('Error updating data.');
-            }
-        }).catch(error => {
-            console.log('Error updating data:', error);
-            res.status(500).send('Error updating data.');
-        });
+            });
+        }
     }
-}
 );
 
 
