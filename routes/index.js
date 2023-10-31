@@ -2,6 +2,7 @@ const rateLimit = require('express-rate-limit');
 let express = require('express');
 let axios = require('axios');
 let router = express.Router();
+const currentServer = process.env.DEVSERVER;
 require('dotenv').config();
 
 const limiter = rateLimit({
@@ -24,7 +25,6 @@ async function getManagementApiToken() {
             audience: `https://${process.env.DOMAIN}/api/v2/`
         })
     };
-
     try {
         const response = await axios.request(options);
         return response.data.access_token;
@@ -36,7 +36,7 @@ async function getManagementApiToken() {
 
 
 // Middleware to check if user is an admin
-async function isAdmin(req, res, next) {
+async function isAdmin(req, res) {
     if (!req.oidc.isAuthenticated()) {
         return false;
     } else {
@@ -67,8 +67,7 @@ async function isAdmin(req, res, next) {
 
 router.get('/', async function (req, res) {
     try {
-        // const response = await axios.get('http://64.227.28.79:3002/public');
-        const response = await axios.get(process.env.DEVSERVER + '/public');
+        const response = await axios.get(currentServer + '/public');
         if (response.data.length === 0) {
             res.render('index', {
                 title: 'CoffeeFacts',
@@ -108,8 +107,7 @@ router.get('/userProfile', async function (req, res) {
         const {token_type, access_token} = req.oidc.accessToken;
 
         try {
-            // const response = await axios.get('http://64.227.28.79:3002/private', {
-            const response = await axios.get(process.env.DEVSERVER + '/private', {
+            const response = await axios.get(currentServer + '/private', {
                 headers: {
                     authorization: `${token_type} ${access_token}`
                 }
@@ -147,8 +145,7 @@ router.get('/editFact/:id', async (req, res) => {
         const user_id = req.oidc.user.sub;
 
         try {
-            // const response = await axios.get(`http://64.227.28.79:3002/editFact/${id}`, {
-            const response = await axios.get(process.env.DEVSERVER + `/editFact/${id}`, {
+            const response = await axios.get(currentServer + `/editFact/${id}`, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -162,6 +159,7 @@ router.get('/editFact/:id', async (req, res) => {
             res.render('editFact', {
                 fact: response.data,
                 isAuthenticated: req.oidc.isAuthenticated(),
+                isAdmin: await isAdmin(req, res)
             });
         } catch (error) {
             console.log('Error fetching data:', error);
@@ -177,10 +175,8 @@ router.post('/editFact/:id', (req, res) => {
     } else {
         const id = req.params.id;
         const {fact, source} = req.body;
-
         // Update the fact using axios
-        // axios.put(`http://64.227.28.79:3002/editFact/${id}`, {
-        axios.put(process.env.DEVSERVER + `/editFact/${id}`, {
+        axios.put(currentServer + `/editFact/${id}`, {
             fact,
             source
         }, {
@@ -209,8 +205,7 @@ router.post('/submit', async (req, res) => {
         const user_id = req.oidc.user.sub;
 
         try {
-            // await axios.post('http://64.227.28.79:3002/addFact', {fact, source, user_id}, {
-            await axios.post(process.env.DEVSERVER + '/addFact', {fact, source, user_id}, {
+            await axios.post(currentServer + '/addFact', {fact, source, user_id}, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -226,8 +221,7 @@ router.post('/deleteFact/:id', (req, res) => {
         return res.status(403).send('You are not authorized to delete this fact.');
     } else {
         const id = req.params.id;
-        // axios.delete(`http://64.227.28.79:3002/deleteFact/${id}`, {
-        axios.delete(process.env.DEVSERVER + `/deleteFact/${id}`, {
+        axios.delete(currentServer + `/deleteFact/${id}`, {
             headers: {
                 authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
             }
@@ -248,8 +242,7 @@ router.get('/adminPanel', async (req, res) => {
         return res.status(403).send('You are not authorized to view this page.');
     } else {
         try {
-            // const response = await axios.get('http://64.227.28.79:3002/unapprovedFacts', {
-            const response = await axios.get(process.env.DEVSERVER + '/unapprovedFacts', {
+            const response = await axios.get(currentServer + '/unapprovedFacts', {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -277,7 +270,7 @@ router.post('/adminApproveFact/:id', async (req, res) => {
             return res.status(403).send('You are not authorized to approve this fact.');
         } else {
             const id = req.params.id;
-            axios.put(process.env.DEVSERVER + `/adminApproveFact/${id}`, {}, {
+            axios.put(currentServer + `/adminApproveFact/${id}`, {}, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
@@ -303,7 +296,7 @@ router.post('/adminRejectFact/:id', async (req, res) => {
             return res.status(403).send('You are not authorized to reject this fact.');
         } else {
             const id = req.params.id;
-            axios.delete(process.env.DEVSERVER + `/adminRejectFact/${id}`, {
+            axios.delete(currentServer + `/adminRejectFact/${id}`, {
                 headers: {
                     authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
                 }
