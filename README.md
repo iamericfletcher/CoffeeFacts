@@ -90,11 +90,11 @@ Built with Express and SQLite3 to handle database interactions.
 - 🛡️ JWT Check
 
 #### `PUT /adminApproveFact/:id`
-- Approves a pending fact.
+- Approves a pending fact and adds it to the public facts.
 - 🛡️ JWT Check
 
 #### `DELETE /adminRejectFact/:id`
-- Rejects a pending fact.
+- Rejects a pending fact and removes it from the database.
 - 🛡️ JWT Check
 
 #### Other CRUD Endpoints

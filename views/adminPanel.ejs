@@ -22,10 +22,14 @@
                     class="source-content"><%= facts[i].submitted_on %></span>
             <div class="button-container">
                 <form action="/adminApproveFact/<%= facts[i].id %>" method="post" class="inline-form">
-                    <button type="submit" class="approve-button" >Approve</button>
+                    <button type="submit" class="approve-button">Approve</button>
                 </form>
+                <!-- TODO - create field for providing a brief reason (hide until Reject & Review button is pushed & submit button that is disabled until reason is provided? -->
                 <form action="/adminRejectFact/<%= facts[i].id %>" method="post" class="inline-form">
-                    <button type="submit" class="reject-button">Reject</button>
+                    <button type="submit" class="reject-and-review-button">Reject & Review</button>
+                </form>
+                <form action="/adminDeleteFact/<%= facts[i].id %>" method="post" class="inline-form">
+                    <button type="submit" class="reject-and-delete-button">Delete Immediately</button>
                 </form>
             </div>
         </li>

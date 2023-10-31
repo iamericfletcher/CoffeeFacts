@@ -314,5 +314,31 @@ router.post('/adminRejectFact/:id', async (req, res) => {
     }
 );
 
+// route for admin delete fact
+router.post('/adminDeleteFact/:id', async (req, res) => {
+        // Check if user is an admin
+        const admin = await isAdmin(req, res);
+        if (!req.oidc.isAuthenticated() || !admin) {
+            return res.status(403).send('You are not authorized to delete this fact.');
+        } else {
+            const id = req.params.id;
+            axios.delete(currentServer + `/adminDeleteFact/${id}`, {
+                headers: {
+                    authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
+                }
+            }).then(response => {
+                if (response.data.success) {
+                    res.redirect('/adminPanel');
+                } else {
+                    res.status(500).send('Error updating data.');
+                }
+            }).catch(error => {
+                console.log('Error updating data:', error);
+                res.status(500).send('Error updating data.');
+            });
+        }
+    }
+);
+
 
 module.exports = router;
