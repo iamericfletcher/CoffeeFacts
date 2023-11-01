@@ -103,6 +103,7 @@ router.get('/userProfile', async function (req, res) {
         // Fetch facts specific to the authenticated user
         let data;
         let data_pending;
+        let data_rejected;
         const userId = req.oidc.user.sub;
         const {token_type, access_token} = req.oidc.accessToken;
 
@@ -116,12 +117,13 @@ router.get('/userProfile', async function (req, res) {
             data = response.data.filter(item => item.user_id === userId && item.is_approved === 1);
             // Filter the response data to only include facts submitted by the authenticated user and are pending approval
             data_pending = response.data.filter(item => item.user_id === userId && item.is_approved === 0);
+            // Filter the response data to only include facts submitted by the authenticated user and are rejected by admin for review by user
+            data_rejected = response.data.filter(item => item.user_id === userId && item.is_approved === 2);
         } catch (error) {
             console.log('Error fetching data:', error);
             data = [{"fact": "Error fetching data from database"}];
             data_pending = [{"fact": "Error fetching data from database"}];
         }
-
         // Render the user profile page
         res.render('userProfile', {
             title: 'Your Profile',
@@ -130,6 +132,7 @@ router.get('/userProfile', async function (req, res) {
             user_id: userId,
             data: data,
             data_pending: data_pending,
+            data_rejected: data_rejected,
             isAdmin: await isAdmin(req, res)
         });
     }

@@ -12,6 +12,11 @@
 <%- include('partials/nav') %>
 <h1>Admin Panel</h1>
 <ul class="fact-list">
+    <% if (facts.length === 0) { %>
+        <li class="fact-item">
+            <span class="fact-content">No facts requiring admin review at this time.</span>
+        </li>
+    <% } %>
     <% for (let i = 0; i < facts.length; i++) { %>
         <li class="fact-item">
             <u><b class="fact-label">Fact:</b></u> <span class="fact-content"><%= facts[i].fact %></span>
