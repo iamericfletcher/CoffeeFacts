@@ -25,6 +25,17 @@
             <br>
             <u><b class="source-label">Fact Submit Date:</b></u> <span
                     class="source-content"><%= facts[i].submitted_on %></span>
+            <br>
+            <% if (facts[i].admin_rejected_for_review_on) { %>
+                <u><b class="source-label">Rejected for Review On:</b></u> <span
+                        class="source-content"><%= facts[i].admin_rejected_for_review_on %></span>
+                <br>
+            <% } %>
+            <% if (facts[i].last_user_edit_on) { %>
+                <u><b class="source-label">Last User Edit On:</b></u> <span
+                        class="source-content"><%= facts[i].last_user_edit_on %></span>
+                <br>
+            <% } %>
             <div class="button-container">
                 <form action="/adminApproveFact/<%= facts[i].id %>" method="post" class="inline-form">
                     <button type="submit" class="approve-button">Approve</button>
