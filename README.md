@@ -164,3 +164,8 @@ Built with `Express` and `Axios` to communicate with the backend where the datab
 - [Auth0](https://auth0.com)
 - [OAuth2 JWT Bearer GitHub](https://github.com/auth0/express-oauth2-jwt-bearer)
 - [Express and Authentication Series using Auth0](https://www.youtube.com/playlist?list=PLshTZo9V1-aGzE7xMaQrCUOQ-R-8A7Jzq)
+
+## Screen Shots
+![coffeefacts-api-homepage](https://github.com/iamericfletcher/CoffeeFacts/assets/64165327/34797782-f9f3-4c46-94a7-39969bd5203e)
+![coffeefacts-api-profile](https://github.com/iamericfletcher/CoffeeFacts/assets/64165327/ade4be1f-5099-4a29-b0bd-74ee928c3767)
+![coffeefacts-api-admin-panel](https://github.com/iamericfletcher/CoffeeFacts/assets/64165327/9650a752-75ae-4c7a-a6e8-82a1693637ac)

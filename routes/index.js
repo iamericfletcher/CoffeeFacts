@@ -176,12 +176,14 @@ router.post('/editFact/:id', (req, res) => {
     if (!req.oidc.isAuthenticated()) {
         return res.status(403).send('You are not authorized to edit this fact.');
     } else {
+        const user_id = req.oidc.user.sub;
         const id = req.params.id;
         const {fact, source} = req.body;
         // Update the fact using axios
         axios.put(currentServer + `/editFact/${id}`, {
             fact,
-            source
+            source,
+            user_id
         }, {
             headers: {
                 authorization: `${req.oidc.accessToken.token_type} ${req.oidc.accessToken.access_token}`
@@ -206,7 +208,6 @@ router.post('/submit', async (req, res) => {
     } else {
         const {fact, source} = req.body;
         const user_id = req.oidc.user.sub;
-
         try {
             await axios.post(currentServer + '/addFact', {fact, source, user_id}, {
                 headers: {
