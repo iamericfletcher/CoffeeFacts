@@ -50,14 +50,17 @@ The API has a rate-limit of 100 requests per 15 minutes per IP.
 | `submitted_on` | DATETIME  | Timestamp of the submission  |
 
 ### `coffee_facts` Table - PRIVATE ROUTE
-
-| Column         | Data Type | Description                  |
-|----------------|-----------|------------------------------|
-| `id`           | INTEGER   | Auto-incremented primary key |
-| `fact`         | TEXT      | The coffee fact text         |
-| `source`       | TEXT      | Source of the fact           |
-| `submitted_on` | DATETIME  | Timestamp of the submission  |
-| `user_id`      | TEXT      | Auth0 user sub identifier*   |
+| Column                         | Data Type | Description                               |
+|--------------------------------|-----------|-------------------------------------------|
+| `id`                           | INTEGER   | Auto-incremented primary key              |
+| `fact`                         | TEXT      | The coffee fact text                      |
+| `source`                       | TEXT      | Source of the fact                        |
+| `user_id`                      | TEXT      | Auth0 user sub identifier                 |
+| `submitted_on`                 | DATETIME  | Timestamp of the fact submission          |
+| `is_approved`                  | INTEGER   | Approval status (0: Pending, 1: Approved) |
+| `admin_approved_on`            | DATETIME  | Timestamp of admin approval               |
+| `admin_rejected_for_review_on` | DATETIME  | Timestamp of admin rejection for review   |
+| `last_user_edit_on`            | DATETIME  | Timestamp of the last user edit           |
 
 #### *Auth0 User Sub Identifier
 
