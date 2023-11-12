@@ -25,6 +25,7 @@ The API has a rate-limit of 100 requests per 15 minutes per IP.
 ## Middleware
 - `limiter`: Handles rate limiting.
 - `isAdmin`: Checks if the logged-in user is an admin.
+- `countRoutes`: Counts the number of backend routes hit by the user.
 
 ## UserFlow
 - User logs in with Auth0.
