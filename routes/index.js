@@ -2,7 +2,7 @@ const rateLimit = require('express-rate-limit');
 let express = require('express');
 let axios = require('axios');
 let router = express.Router();
-const currentServer = process.env.DEVSERVER;
+const currentServer = process.env.PRODSERVER;
 require('dotenv').config();
 
 const limiter = rateLimit({
