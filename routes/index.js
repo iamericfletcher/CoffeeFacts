@@ -119,6 +119,9 @@ router.get('/userProfile', async function (req, res) {
             data_pending = response.data.filter(item => item.user_id === userId && item.is_approved === 0);
             // Filter the response data to only include facts submitted by the authenticated user and are rejected by admin for review by user
             data_rejected = response.data.filter(item => item.user_id === userId && item.is_approved === 2);
+            console.log('data:', data);
+            console.log('data_pending:', data_pending);
+            console.log('data_rejected:', data_rejected);
         } catch (error) {
             console.log('Error fetching data:', error);
             data = [{"fact": "Error fetching data from database"}];
