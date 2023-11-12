@@ -10,7 +10,7 @@ const limiter = rateLimit({
     max: 100 // limit each IP to 100 requests per windowMs
 });
 
-// Apply to all requests
+// Apply to all request
 router.use(limiter);
 
 async function getManagementApiToken() {
