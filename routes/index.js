@@ -1,9 +1,11 @@
 const rateLimit = require('express-rate-limit');
 let express = require('express');
 let axios = require('axios');
+const sqlite3 = require('sqlite3').verbose();
 let router = express.Router();
 const currentServer = process.env.DEVSERVER;
 require('dotenv').config();
+let db = new sqlite3.Database(process.env.TESTDBPATH);
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -12,6 +14,28 @@ const limiter = rateLimit({
 
 // Apply to all requests
 router.use(limiter);
+
+// Middleware to count route usage
+function countRoutes(req, res, next) {
+    let route = req.path;
+
+    // If route includes '/editFact/' or '/deleteFact/', trim off the '/:id' portion
+    if (route.includes('/editFact/') || route.includes('/deleteFact/')) {
+        route = '/' + route.split('/')[1];
+    }
+
+    // Increment counter in database
+    db.run("INSERT OR IGNORE INTO routeCounts (route_name, access_count) VALUES (?, 0)", [route], function (err) {
+        if (err) return console.log(err);
+
+        db.run("UPDATE routeCounts SET access_count = access_count + 1 WHERE route_name = ?", [route], function (err) {
+            if (err) return console.log(err);
+        });
+    });
+    next();
+}
+
+router.use(countRoutes); // Apply the route count middleware to all routes
 
 async function getManagementApiToken() {
     const options = {
