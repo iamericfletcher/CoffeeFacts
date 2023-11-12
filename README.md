@@ -1,4 +1,4 @@
-# Coffee Facts API
+# Coffee-Facts-API
 
 Welcome to Coffee Facts API! This project is for anyone looking to learn about interacting with APIs, creating routes,
 or, for those who love coffee, that amazing energizing elixir, to borrow a term from [Boston Dynamic's Spot the Dog with
@@ -19,6 +19,25 @@ at [Coffee Facts API Backend](https://github.com/iamericfletcher/CoffeeFactsDBAP
 - **Process Management**: PM2
 - **Rate Limiting**: Express Rate Limit
 
+## Rate Limiting
+The API has a rate-limit of 100 requests per 15 minutes per IP.
+
+## Middleware
+- `limiter`: Handles rate limiting.
+- `isAdmin`: Checks if the logged-in user is an admin.
+
+## UserFlow
+- User logs in with Auth0.
+- User is redirected to the homepage.
+- User can view a random coffee fact on the homepage.
+- User can view their profile.
+- User can add a new coffee fact from their profile.
+- User can edit or delete coffee facts they've previously submitted from their profile page.
+- User can edit or delete coffee facts they've submitted but not yet reviewed by an admin from their profile page.
+- Admin can view admin panel.
+- Admin can view all unapproved facts from the admin panel.
+- Admin can approve or reject a pending fact from the admin panel.
+
 ## Database Schema
 
 ### `coffee_facts` Table - PUBLIC ROUTE
@@ -31,21 +50,24 @@ at [Coffee Facts API Backend](https://github.com/iamericfletcher/CoffeeFactsDBAP
 | `submitted_on` | DATETIME  | Timestamp of the submission  |
 
 ### `coffee_facts` Table - PRIVATE ROUTE
-
-| Column         | Data Type | Description                  |
-|----------------|-----------|------------------------------|
-| `id`           | INTEGER   | Auto-incremented primary key |
-| `fact`         | TEXT      | The coffee fact text         |
-| `source`       | TEXT      | Source of the fact           |
-| `submitted_on` | DATETIME  | Timestamp of the submission  |
-| `user_id`      | TEXT      | Auth0 user sub identifier*   |
+| Column                         | Data Type | Description                               |
+|--------------------------------|-----------|-------------------------------------------|
+| `id`                           | INTEGER   | Auto-incremented primary key              |
+| `fact`                         | TEXT      | The coffee fact text                      |
+| `source`                       | TEXT      | Source of the fact                        |
+| `user_id`                      | TEXT      | Auth0 user sub identifier                 |
+| `submitted_on`                 | DATETIME  | Timestamp of the fact submission          |
+| `is_approved`                  | INTEGER   | Approval status (0: Pending, 1: Approved) |
+| `admin_approved_on`            | DATETIME  | Timestamp of admin approval               |
+| `admin_rejected_for_review_on` | DATETIME  | Timestamp of admin rejection for review   |
+| `last_user_edit_on`            | DATETIME  | Timestamp of the last user edit           |
 
 #### *Auth0 User Sub Identifier
 
 - Subject Identifier. A locally unique and never reassigned identifier within the Issuer for the End-User, which is
   intended to be consumed by the Client, e.g., 24400320 or AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4.
-    - https://auth0.com/docs/secure/tokens
-    - https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+  - https://auth0.com/docs/secure/tokens
+  - https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
 
 ## API
 
@@ -56,48 +78,84 @@ checks on all routes except `/public`.
 
 ### CoffeeFactsDBAPI Endpoints (Backend)
 
-#### `GET /public`
+Built with Express and SQLite3 to handle database interactions.
 
+#### `GET /public`
 - Fetches all public coffee facts.
 - 🛡️ No authentication needed
 
 #### `GET /private`
-
 - Fetches all facts, including Auth0 `user_id`.
+- 🛡️ JWT Check
+
+#### `GET /unapprovedFacts`
+- Fetches all unapproved facts for display in the admin panel.
+- 🛡️ JWT Check
+
+#### `PUT /adminApproveFact/:id`
+- Approves a pending fact and adds it to the public facts.
+- 🛡️ JWT Check
+
+#### `DELETE /adminRejectFact/:id`
+- Rejects a pending fact and removes it from the database.
 - 🛡️ JWT Check
 
 #### Other CRUD Endpoints
 
-- `POST /addFact`, `PUT /editFact/:id`, `DELETE /deleteFact/:id`
+#### `POST /addFact`
+- Adds a new coffee fact to the database.
 - 🛡️ JWT Check
+
+#### `PUT /editFact/:id`
+- Updates a specific fact in the database.
+- 🛡️ JWT Check
+
+#### `DELETE /deleteFact/:id`
+- Deletes a specific fact from the database.
+- 🛡️ JWT Check
+
 
 ### CoffeeFacts Endpoints (Frontend)
 
-Built with Axios to communicate with the backend where the database interactions take place.
+Built with `Express` and `Axios` to communicate with the backend where the database interactions take place.
 
 #### `GET /`
-
-- Fetches a random coffee fact to display on the homepage.
+- Renders the homepage and shows a random coffee fact.
+- The random fact for display on the homepage are from facts that have been approved by an admin.
+- 🛡️ No authentication needed
 
 #### `GET /userProfile`
-
-- Shows user-specific coffee facts.
+- Renders the user profile page and shows all facts submitted by the logged-in user (approved and pending facts).
 - 🛡️ Requires Auth
 
 #### `GET /editFact/:id` & `POST /editFact/:id`
-
-- Fetch and update a specific fact.
+- Renders the edit fact page and allows the user to edit a specific fact and submit the changes.
+- Fields in the edit fact page are pre-populated with the existing fact and source.
 - 🛡️ Requires Auth
 
 #### `POST /submit`
-
-- Adds a new coffee fact.
+- Submits a new coffee fact to the database and redirects to the user profile page.
+- New facts are pending until an admin approves them.
 - 🛡️ Requires Auth
 
 #### `POST /deleteFact/:id`
-
-- Deletes a specific coffee fact.
+- Deletes a specific fact from the database.
 - 🛡️ Requires Auth
+
+#### `GET /adminPanel`
+- Renders the admin panel page and shows all unapproved facts.
+- Each unapproved fact has an approval and reject button.
+- - 🛡️ Requires Auth
+
+#### `POST /adminApproveFact/:id`
+- Admin-only route to approve a pending fact and add it to the public facts.
+- Redirects back to the admin panel page.
+- - 🛡️ Requires Auth
+
+#### `POST /adminRejectFact/:id`
+- Admin-only route to reject a pending fact and remove it from the database.
+- Redirects back to the admin panel page.
+- - 🛡️ Requires Auth
 
 ## Contributing
 
@@ -109,3 +167,11 @@ Built with Axios to communicate with the backend where the database interactions
 - [Auth0](https://auth0.com)
 - [OAuth2 JWT Bearer GitHub](https://github.com/auth0/express-oauth2-jwt-bearer)
 - [Express and Authentication Series using Auth0](https://www.youtube.com/playlist?list=PLshTZo9V1-aGzE7xMaQrCUOQ-R-8A7Jzq)
+
+## Screen Shots
+### Homepage
+![coffeefacts-api-homepage](https://github.com/iamericfletcher/CoffeeFacts/assets/64165327/34797782-f9f3-4c46-94a7-39969bd5203e)
+### Profile
+![coffeefacts-api-profile](https://github.com/iamericfletcher/CoffeeFacts/assets/64165327/ade4be1f-5099-4a29-b0bd-74ee928c3767)
+### Admin Panel
+![coffeefacts-api-admin-panel](https://github.com/iamericfletcher/CoffeeFacts/assets/64165327/9650a752-75ae-4c7a-a6e8-82a1693637ac)

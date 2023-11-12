@@ -20,7 +20,13 @@
     <br>
     <input type="submit" value="Submit">
 </form>
-<h2>Your Coffee Facts</h2>
+<h2>Your Coffee Facts (Approved)</h2>
+<% if (data.length === 0) { %>
+    <li class="fact-item">
+        <span class="fact-content">No approved facts (submit a fact today!).</span>
+    </li>
+<% } %>
+
 <ul class="fact-list">
     <% for (let i = 0; i < data.length; i++) { %>
         <li class="fact-item">
@@ -39,5 +45,54 @@
         </li>
     <% } %>
 </ul>
+<h2>Your Coffee Facts (Pending Review by Admin)</h2>
+<% if (data_pending.length === 0) { %>
+    <li class="fact-item">
+        <span class="fact-content">No facts pending review at this time.</span>
+    </li>
+<% } %>
+<ul class="fact-list">
+    <% for (let i = 0; i < data_pending.length; i++) { %>
+        <li class="fact-item">
+            <u><b class="fact-label">Fact:</b></u> <span class="fact-content"><%= data_pending[i].fact %></span>
+            <br>
+            <u><b class="source-label">Source:</b></u> <span class="source-content"><%= data_pending[i].source %></span>
+            <br>
+            <u><b class="source-label">Fact Submit Date:</b></u> <span
+                    class="source-content"><%= data_pending[i].submitted_on %></span>
+            <div class="button-container">
+                <a class="edit-button" href="/editFact/<%= data_pending[i].id %>">Edit</a>
+                <form action="/deleteFact/<%= data_pending[i].id %>" method="post" class="inline-form">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </div>
+        </li>
+    <% } %>
+</ul>
+<h2>Your Coffee Facts (Rejected by Admin for Review)</h2>
+<% if (data_rejected.length === 0) { %>
+    <li class="fact-item">
+        <span class="fact-content">No facts pending review at this time.</span>
+    </li>
+<% } %>
+<ul class="fact-list">
+    <% for (let i = 0; i < data_rejected.length; i++) { %>
+        <li class="fact-item">
+            <u><b class="fact-label">Fact:</b></u> <span class="fact-content"><%= data_rejected[i].fact %></span>
+            <br>
+            <u><b class="source-label">Source:</b></u> <span class="source-content"><%= data_rejected[i].source %></span>
+            <br>
+            <u><b class="source-label">Fact Submit Date:</b></u> <span
+                    class="source-content"><%= data_rejected[i].submitted_on %></span>
+            <div class="button-container">
+                <a class="edit-button" href="/editFact/<%= data_rejected[i].id %>">Edit</a>
+                <form action="/deleteFact/<%= data_rejected[i].id %>" method="post" class="inline-form">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </div>
+        </li>
+    <% } %>
+</ul>
+
 </body>
 </html>
