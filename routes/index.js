@@ -5,7 +5,8 @@ const sqlite3 = require('sqlite3').verbose();
 let router = express.Router();
 const currentServer = process.env.DEVSERVER;
 require('dotenv').config();
-let db = new sqlite3.Database(process.env.TESTDBPATH);
+// let db = new sqlite3.Database(process.env.TESTDBPATH);
+let db = new sqlite3.Database(process.env.DBPATH);
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
