@@ -1,3 +1,5 @@
+# This project is now offline - 2023/12/31
+
 # Coffee-Facts-API
 
 Welcome to Coffee Facts API! This project is for anyone looking to learn about interacting with APIs, creating routes,
